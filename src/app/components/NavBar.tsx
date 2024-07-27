@@ -9,8 +9,9 @@ const NavBar = () => {
   
   const navLinks = [
     { href: '/', label: 'Home' },
-    { href: '/about', label: 'About' },
-    { href: '/posts', label: 'Posts' },
+    { href: '/musicGenres', label: 'Music Genres' },
+    // { href: '/about', label: 'About' },
+    // { href: '/posts', label: 'Posts' },
   ];
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);

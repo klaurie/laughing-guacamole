@@ -1,38 +1,58 @@
-import React from 'react'
+import React from "react";
 
 export interface MusicGenre {
   genre: string;
+  subgenres: string[];
 }
 
 interface MusicGenreListProps {
   genres: MusicGenre[];
+  setSelectedMusicGenre: (genre: string) => void;
 }
 
-const MusicGenreList: React.FC<MusicGenreListProps > = ({
-  genres,
-}) => {
+const MusicGenreList: React.FC<MusicGenreListProps> = ({ genres, setSelectedMusicGenre }) => {
   return (
-    <>
-    <div>Music Genre List</div>
     <div
+      className="p-4"
     >
-      <table className="table table-zebra w-full">
-        <thead>
-          <tr>
-            <th>Genre</th>
-          </tr>
-        </thead>
-        <tbody>
-          {genres.map((genre) => (
-            <tr key={genre.genre} className="hover">
-              <td>{genre.genre}</td>
+      <div>Music Genre List</div>
+      <div>
+        <table className="table table-zebra w-full">
+          <thead>
+            <tr>
+              <th>Genre</th>
+              <th>Action</th>
+              <th>SubGenres</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {genres.map((genre) => (
+              <>
+              <tr key={genre.genre} >
+                <td>{genre.genre}</td>
+                <td>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => setSelectedMusicGenre(genre.genre)}
+                  >
+                    Select
+                  </button>
+                </td>
+                <td>
+                  <ul>
+                    {genre.subgenres.map((subgenre) => (
+                      <li key={subgenre}>{subgenre}</li>
+                    ))}
+                  </ul>
+                </td>
+              </tr>
+              </>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
-    </>
-  )
-}
+  );
+};
 
-export default MusicGenreList
+export default MusicGenreList;

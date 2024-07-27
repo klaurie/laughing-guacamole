@@ -4,19 +4,13 @@ import React, { useEffect, useState } from "react";
 interface LoginProps {
   setMusicGenres: any;
   defaultMusicGenres: any;
+  handleImportMusic: () => void;
 }
-
-type User = {
-  id: number;
-  name: string;
-  username: string;
-  email: string;
-  website: string;
-};
 
 const Login: React.FC<LoginProps> = ({
   setMusicGenres,
-  defaultMusicGenres
+  defaultMusicGenres,
+  handleImportMusic,
 }) => {
   const APP_URL = process.env.NEXT_PUBLIC_APP_URL;
   const openModal = () => {
@@ -26,20 +20,38 @@ const Login: React.FC<LoginProps> = ({
     modal?.showModal();
   };
 
+  const closeModal = () => {
+    const modal = document.getElementById(
+      "my_modal_3"
+    ) as HTMLDialogElement | null;
+    modal?.close();
+  };
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [uid, setUid] = useState("");
 
+  // retrieve user music info from Spotify
   const handleLogin = async () => {
+    console.log(defaultMusicGenres);
+    if (defaultMusicGenres.length > 0) {
+      handleImportMusic();
+    }
     setMusicGenres(defaultMusicGenres);
+    closeModal();
   };
+
 
   return (
     <>
       {/* You can open the modal using document.getElementById('ID').showModal() method */}
-      <button className="btn btn-primary" onClick={openModal}>
-        Import Spotify Music
-      </button>
+      <div
+        className="flex gap-2 py-4 justify-center"
+      >
+        <button className="btn btn-primary" onClick={openModal}>
+          Import Spotify Music
+        </button>
+      </div>
       <dialog id="my_modal_3" className="modal">
         <div className="modal-box">
           <form method="dialog">
