@@ -7,7 +7,7 @@ import Login from "./components/Login";
 import MusicGenreList from "./components/MusicGenreList";
 import { Movie } from "./components/MovieList";
 import { MusicGenre } from "./components/MusicGenreList";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useMyContext, MyContextProps } from "./AppContext";
 
 const DEFAULT_MOVIE_GENRES = [
@@ -85,8 +85,27 @@ export default function Home() {
   // const [selectedMusicGenre, setSelectedMusicGenre] = useState("");
 
   const {musicGenres, setMusicGenres, selectedMusicGenre, setSelectedMusicGenre} = useMyContext();
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   
   const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  useEffect(() => {
+    const access_token = searchParams.get("access_token") || "";
+    const refresh_token = searchParams.get("refresh_token") || "";
+    console.log('access_token: ' + access_token);
+    console.log('refresh_token: ' + refresh_token);
+    if (access_token) {
+      setAccessToken(access_token);
+      localStorage.setItem("access_token", access_token);
+    }
+    if (refresh_token) {
+      localStorage.setItem("refresh_token", refresh_token);
+    }
+  }, [searchParams]);
+
+  // get query params
+  // const { access_token, refresh_token, scope } = router.query;
 
   // fetch movie genres
 
@@ -103,6 +122,10 @@ export default function Home() {
     setMusicGenres([]);
     setMovies([]);
   };
+
+  const handleNext = () => {
+    router.push("/musicGenres")
+  }
   return (
     <>
       <MovieGenreSelector
@@ -115,6 +138,14 @@ export default function Home() {
         defaultMusicGenres={DEFAULT_MUSIC_GENRES}
         handleImportMusic={handleImportMusic}
       />
+
+      {accessToken && <div
+          className="flex w-full justify-center gap-4 "
+        >
+          <button className="btn btn-primary" onClick={handleNext}>
+            Next
+          </button>
+        </div>}
       {/* <MusicGenreList
         genres={musicGenres?.slice(0, 3)}
         setSelectedMusicGenre={setSelectedMusicGenre}

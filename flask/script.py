@@ -3,8 +3,10 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from collections import Counter
 import csv
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 # Load the CSV file and create a dictionary that maps subgenres to their genres
 def map_subgenre_to_genre(csv_file_path):

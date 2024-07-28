@@ -96,8 +96,9 @@ app.get('/callback', function (req, res) {
 
         // we can also pass the token to the browser to make requests from there
         res.redirect(
+          'http://localhost:3000?' +
           // 'http://127.0.0.1:5000?' +
-          'http://127.0.0.1:5000/top_genres?' +
+          // 'http://127.0.0.1:5000/top_genres?' +
           // '/getTopGenres?' +
             querystring.stringify({
               access_token: access_token,
@@ -106,8 +107,9 @@ app.get('/callback', function (req, res) {
         );
       } else {
         res.redirect(
+          'http://localhost:3000?' +
           // 'http://127.0.0.1:5000?' +
-          'http://127.0.0.1:5000/top_genres?' +
+          // 'http://127.0.0.1:5000/top_genres?' +
           // '/getTopGenres?' +
             querystring.stringify({
               error: 'invalid_token',

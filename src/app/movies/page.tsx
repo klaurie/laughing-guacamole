@@ -1,6 +1,6 @@
 'use client'
 
-import React, { Suspense, useEffect } from 'react'
+import React, { Suspense, useEffect, useState } from 'react'
 import MovieList, { Movie } from '../components/MovieList'
 import LoadingComponent from '../LoadingComponent'
 import { join } from 'path';
@@ -40,27 +40,33 @@ const DEFAULT_MOVIES = [
 const MoviesPage = () => {
   const [movies, setMovies] = React.useState<Movie[]>([])
   const [loading, setLoading] = React.useState<boolean>(true)
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   
   useEffect(() => {
-    try {
-      // get recommended movies from model 
+    const access_token = localStorage.getItem("access_token") || "";
+    console.log('access_token: ' + access_token);
+    if (access_token) {
+      try {
+        // get recommended movies from model using access token or top genres from previous step
+        
+        
 
-      setTimeout(() => {
-        setMovies(DEFAULT_MOVIES)
-        setLoading(false);
-      }, 2000);
-    }
-    catch (error) {
-      console.log(error)
+        setTimeout(() => {
+          setMovies(DEFAULT_MOVIES)
+          setLoading(false);
+        }, 2000);
+      }
+      catch (error) {
+        console.log(error)
+      }
     }
   }, [])
 
   if (loading) return <LoadingComponent />
-  // if(loading) return <p>Loading...</p>
   
   return (
     <Suspense fallback={<LoadingComponent />}>
-      <MovieList movies={movies} />
+      {movies && <MovieList movies={movies} />}
     </Suspense>
   )
 }
