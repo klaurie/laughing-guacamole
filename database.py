@@ -1,5 +1,6 @@
 import pymongo
 from pymongo import MongoClient
+import re
 from credentials import creds
 
 
@@ -82,6 +83,41 @@ class mongoData():
         result = self.collection.update_many(filter, update)
         print(f"Updated {result.modified_count} documents.")
 
-    def remove_all(self):
+    # deletes all documents
+    def delete_all(self):
         result = self.collection.delete_many({})
         print(f"Deleted {result.deleted_count} documents.")
+
+    # deletes all uncredited movies
+    def remove_uncredited(self):
+        pattern = re.compile(r'\s*\(uncredited\)')
+        documents = self.collection.find({"performed_by": {"$regex": pattern}})
+        
+        for doc in documents:
+            new_performed_by = re.sub(pattern, '', doc['performed_by']).strip()
+            self.collection.update_one({"_id": doc["_id"]}, {"$set": {"performed_by": new_performed_by}})
+            print(f"Updated document ID {doc['_id']}")
+
+    # Joins all collections on title
+    def join_collections_on_title(self, other_db_name, other_coll_name):
+        # Connect to the other database and collection
+        other_db = self.client[other_db_name]
+        other_collection = other_db[other_coll_name]
+
+        # Fetch all documents from both collections
+        docs1 = list(self.collection.find())
+        docs2 = list(other_collection.find())
+        
+        # Create a dictionary to store documents from the first collection by title
+        docs1_by_title = {doc['name']: doc for doc in docs1}
+        
+        # List to store the joined documents
+        joined_docs = []
+        
+        for doc2 in docs2:
+            title = doc2['name']
+            if title in docs1_by_title:
+                joined_doc = {**docs1_by_title[title], **doc2}  # Combine documents
+                joined_docs.append(joined_doc)
+        
+        return joined_docs
