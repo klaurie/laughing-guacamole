@@ -1,3 +1,5 @@
+
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 interface LoginProps {
@@ -11,6 +13,7 @@ const Login: React.FC<LoginProps> = ({
   defaultMusicGenres,
   handleImportMusic,
 }) => {
+  const router = useRouter();
   const APP_URL = process.env.NEXT_PUBLIC_APP_URL;
   const openModal = () => {
     const modal = document.getElementById(
@@ -35,7 +38,8 @@ const Login: React.FC<LoginProps> = ({
     console.log(defaultMusicGenres);
 
     // Redirect to the backend login endpoint
-    window.location.href = `${APP_URL}/login`;
+    router.push(`${APP_URL}/login`);
+    // window.location.href = `${APP_URL}/login`;
   };
 
   const handleFakeLogin = async () => {
