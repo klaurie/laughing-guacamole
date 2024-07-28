@@ -17,10 +17,84 @@ import sys
 import gurobipy as gp
 from gurobipy import GRB
 
+
+# Function to find the index of a subgenre
+def find_index_by_subgenre(genre, genre_df, subgenre=False):
+
+    if subgenre:
+        result = genre_df.index[genre_df['Subgenre'] == genre].tolist()
+    else:
+        result = genre_df.index[genre_df['Genre'] == genre].tolist()
+
+    if len(result) > 0:
+        return result
+    else:
+        return None
+
+
+
+def read_data():
+    movie_df = pd.read_csv('../categorized_movies.csv')
+    output_file_path = 'modified_categorized_movies.csv'
+    movie_df.to_csv(output_file_path, index=False)
+    user_df = {
+        'Genre': ['pop'],
+        'Subgenre 1': ['indie pop'],
+        'Subgenre 2': ['uk pop'],
+        'Subgenre 3': ['j-poprock']
+    }
+    genre_df = pd.read_excel('Music Genres_Subgenres.xlsx', sheet_name='Data')
+    genre_ref_df = pd.read_excel('Music Genres_Subgenres.xlsx', sheet_name='Reference')
+
+    rows_to_remove = []
+    # Map genres to their indices
+    genre = user_df['Genre'][0]  # Get the genre string
+    index = find_index_by_subgenre(genre, genre_ref_df)
+    if index is not None:
+        user_df['Genre'][0] = index
+    else:
+        print(f"The genre '{genre}' was not found in the DataFrame.")
+        rows_to_remove.append(i)
+
+    for i in range(movie_df.shape[0]):
+        # movies mapping
+        genre = movie_df.loc[i, 'Genre']  # Get the genre string
+        index = find_index_by_subgenre(genre, genre_ref_df)
+        if index is not None:
+            movie_df.loc[i, 'Genre'] = index
+        else:
+            print(f"The genre '{genre}' was not found in the DataFrame.")
+            rows_to_remove.append(i)
+
+    # Map subgenres to their indices
+    for subgenre_col in ['Subgenre 1', 'Subgenre 2', 'Subgenre 3']:
+        subgenre = user_df[subgenre_col][0]  # Get the subgenre string
+        index = find_index_by_subgenre(subgenre, genre_df, True)
+        if index is not None:
+            user_df[subgenre_col][0] = index[0]
+        else:
+            print(f"The subgenre '{subgenre}' was not found in the DataFrame.")
+            rows_to_remove.append(i)
+
+        # now for movie data
+        subgenre = movie_df[subgenre_col][0]  # Get the subgenre string
+        index = find_index_by_subgenre(subgenre, genre_df, 'subgenre')
+        if index is not None:
+            movie_df[subgenre_col][0] = index[0]
+        else:
+            print(f"The subgenre '{subgenre}' was not found in the DataFrame.")
+            rows_to_remove.append(i)
+
+    # Remove rows that have subgenres not found in the genre DataFrame
+    movie_df = movie_df.drop(rows_to_remove).reset_index(drop=True)
+
+    return movie_df, user_df, genre_df
+
+
 def run_model(user_data, movie_data, genre_reference):
     # Priority (Lower the value, higher the priority). Penalty is 10^(6-x)
     weights = {
-        'Objective Component': ['Soundtrack Subgenre 1', 'Soundtrack Subgenre 2', 'Soundtrack Subgenre 3', 'Movie Genre'],
+        'Objective Component': ['Soundtrack Subgenre 1', 'Soundtrack Subgenre 2', 'Soundtrack Subgenre 3'],
         'Priority': [0, 4, 6, 9]
     }
 
@@ -30,8 +104,8 @@ def run_model(user_data, movie_data, genre_reference):
     num_genres = len(unique_genres)
     unique_movies = pd.unique(movie_data['name'])
     num_movies = len(unique_movies)
-    unique_movie_genres = pd.unique(movie_data['Genre'])
-    num_movie_genres = len(unique_movie_genres)
+    #unique_movie_genres = pd.unique(movie_data['Genre'])
+    #num_movie_genres = len(unique_movie_genres)
     num_subgenres = genre_reference.shape[0]
 
     genre_association = {
@@ -57,6 +131,8 @@ def run_model(user_data, movie_data, genre_reference):
         "War": [5, 10, 9, 14],
         "Western": [7, 8, 11]
     }
+
+    """
     genre_association_binary = pd.DataFrame(np.zeros((num_movie_genres, num_genres)))
     for i in range(num_movie_genres):
         for j in range(num_genres):
@@ -66,8 +142,10 @@ def run_model(user_data, movie_data, genre_reference):
     for i in range(num_movies):
         for j in range(num_movie_genres):
             movie_genres_binary2.iloc[i, j] = 1
+"""
 
     # Binary indicator of a movies soundtrack genre
+    print(movie_data['Genre'])
     movie_genres_binary = pd.DataFrame(np.zeros((num_movies, num_genres)))
     for i in range(num_movies):
             movie_genres_binary.iloc[i, movie_data.loc[i, 'Genre']] = 1
@@ -121,19 +199,23 @@ def run_model(user_data, movie_data, genre_reference):
         z_subgenre3 = m.addVars([a for a in list(range(num_movies))],
                                 [a for a in list(range(num_subgenres))], ub=1, vtype=GRB.BINARY, name='z_subgenre3')
 
-        # indicate if user genre does not match movie genre
-        w = m.addVars([a for a in list(range(num_movie_genres))],
-                      [a for a in list(range(num_genres))],
-                      ub=1, vtype=GRB.BINARY, name='w')
-
+    """
+            # indicate if user genre does not match movie genre
+            w = m.addVars([a for a in list(range(num_movie_genres))],
+                          [a for a in list(range(num_genres))],
+                          ub=1, vtype=GRB.BINARY, name='w')
+    """
     # ------------------- Objective Definition ------------------------------------
     if True:
         m.setObjective(gp.quicksum((10**(int(6-weights['Priority'][0])*z_subgenre1[m])) +
                                    (10**(int(6-weights['Priority'][1])*z_subgenre2[m])) +
-                                   (10**(int(6-weights['Priority'][2])*z_subgenre3[m])) for m in range(num_movies) for s in range(num_subgenres))+
-                       gp.quicksum((10**(int(6-weights['Priority'][3])*w[i,j]) for i in range(num_movie_genres)
-                       for j in range(num_genres))), sense=GRB.MAXIMIZE)
+                                   (10**(int(6-weights['Priority'][2])*z_subgenre3[m])) for m in range(num_movies)
+                                   for s in range(num_subgenres)), sense=GRB.MAXIMIZE)
 
+        """
+                gp.quicksum((10 ** (int(6 - weights['Priority'][3]) * w[i, j]) for i in range(num_movie_genres)
+                             for j in range(num_genres)))
+        """
         # End timing for variable and objective creation
         end_var_obj = time.time()
 
@@ -161,14 +243,14 @@ def run_model(user_data, movie_data, genre_reference):
         m.addConstr(3 >= gp.quicksum(z_subgenre1[i] + z_subgenre2[i] + z_subgenre3[i]
                                                           for i in range(num_movies)))
 
+        """
         m.addConstrs(x[i] <= (1 - (genre_association_binary.iloc[i, j] + movie_genres_binary2[k, i] * user_genres_binary[j])
                      for i in range(num_movie_genres)
                      for j in range(num_genres)
                      for k in range(num_movies)))
-
+        """
         # End timing for constraint creation
         end_constraints = time.time()
-
 
     m.write("movie_rec_model.lp")
 
@@ -215,3 +297,7 @@ def run_model(user_data, movie_data, genre_reference):
 
     # returns list of recommended movie/movies?
     return [i for i in range(num_movies) if x[i] == 1]
+
+if __name__ == "__main__":
+    movie_df, user_df, genre_df = read_data()
+    run_model(user_df, movie_df, genre_df)
