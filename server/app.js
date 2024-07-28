@@ -34,7 +34,7 @@ app.get('/login', function (req, res) {
   res.cookie(stateKey, state);
 
   // your application requests authorization
-  var scope = 'user-read-private user-read-email';
+  var scope = 'user-read-private user-read-email user-read-recently-played user-top-read';
 
   res.redirect(
     'https://accounts.spotify.com/authorize?' +
@@ -96,7 +96,7 @@ app.get('/callback', function (req, res) {
 
         // we can also pass the token to the browser to make requests from there
         res.redirect(
-          '/#' +
+          '/getTopGenres?' +
             querystring.stringify({
               access_token: access_token,
               refresh_token: refresh_token,
@@ -104,7 +104,7 @@ app.get('/callback', function (req, res) {
         );
       } else {
         res.redirect(
-          '/#' +
+          '/getTopGenres?' +
             querystring.stringify({
               error: 'invalid_token',
             })
@@ -113,6 +113,24 @@ app.get('/callback', function (req, res) {
     });
   }
 });
+
+app.get('/getTopGenres', async function (req, res) {
+  
+  const access_token = req.query.access_token;
+  const refresh_token = req.query.refresh_token;
+  const scope = req.query.scope;
+
+  console.log('access_token: ' + access_token);
+  console.log('refresh_token: ' + refresh_token);
+  console.log('scope: ' + scope);
+
+  if (access_token && refresh_token) {
+    res.send(access_token);
+  } else {
+    res.send('invalid_token');
+  }
+  
+})
 
 const DEFAULT_MUSIC_GENRES = [
   { genre: 'Rock', subgenres: ['Alternative', 'Classic Rock', 'Hard Rock'] },
