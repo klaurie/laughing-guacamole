@@ -96,7 +96,8 @@ app.get('/callback', function (req, res) {
 
         // we can also pass the token to the browser to make requests from there
         res.redirect(
-          '/getTopGenres?' +
+          'http://127.0.0.1:5000/top_genres?' +
+          // '/getTopGenres?' +
             querystring.stringify({
               access_token: access_token,
               refresh_token: refresh_token,
@@ -104,7 +105,8 @@ app.get('/callback', function (req, res) {
         );
       } else {
         res.redirect(
-          '/getTopGenres?' +
+          'http://127.0.0.1:5000/top_genres?' +
+          // '/getTopGenres?' +
             querystring.stringify({
               error: 'invalid_token',
             })
@@ -124,11 +126,28 @@ app.get('/getTopGenres', async function (req, res) {
   console.log('refresh_token: ' + refresh_token);
   console.log('scope: ' + scope);
 
-  if (access_token && refresh_token) {
-    res.send(access_token);
-  } else {
-    res.send('invalid_token');
-  }
+  // use access token
+
+
+  const response = await fetch('https://api.spotify.com/v1/me/top/artists', {
+    headers: {
+      Authorization: 'Bearer ' + access_token
+    }
+  });
+
+  const data = await response.json();
+  console.log(data);
+  res.send(data);
+
+  // const options = {
+  //   url: 'https://api.spotify.com/v1/me/top/artists',
+  //   headers: { Authorization: 'Bearer ' + access_token },
+  //   json: true,
+  // };
+  // request.get(options, function (error, response, body) {
+  //   console.log(body);
+  //   res.send(body);
+  // });
   
 })
 
