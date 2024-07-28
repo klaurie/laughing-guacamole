@@ -1,4 +1,3 @@
-import { appendFile } from "fs";
 import React, { useEffect, useState } from "react";
 
 interface LoginProps {
@@ -35,28 +34,10 @@ const Login: React.FC<LoginProps> = ({
   const handleLogin = async () => {
     console.log(defaultMusicGenres);
 
-    try {
-      // // fetch auth token from backend 
-      const response = await fetch(
-        `${APP_URL}/login` ,
-      );
-      // top music genres 
-      const data = await response.json();
-      console.log('data', data);
-      
-      // // set music genres
-      // if (defaultMusicGenres.length > 0) {
-      //   handleImportMusic();
-      // }
-      // setMusicGenres(defaultMusicGenres);
-      closeModal();
-
-    }
-    catch (error) {
-      console.error(error);
-    }
-
+    // Redirect to the backend login endpoint
+    window.location.href = `${APP_URL}/login`;
   };
+
   const handleFakeLogin = async () => {
     console.log(defaultMusicGenres);
 
@@ -67,7 +48,6 @@ const Login: React.FC<LoginProps> = ({
       // console.log('response', response);
       const data = await response.json();
       console.log('data', data);
-      
       
       if (defaultMusicGenres.length > 0) {
         handleImportMusic();
@@ -82,13 +62,10 @@ const Login: React.FC<LoginProps> = ({
 
   };
 
-
   return (
     <>
       {/* You can open the modal using document.getElementById('ID').showModal() method */}
-      <div
-        className="flex gap-2 py-4 justify-center"
-      >
+      <div className="flex gap-2 py-4 justify-center">
         <button className="btn btn-primary" onClick={openModal}>
           Import Spotify Music
         </button>
