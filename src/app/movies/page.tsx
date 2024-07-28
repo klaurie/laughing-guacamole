@@ -42,11 +42,17 @@ const MoviesPage = () => {
   const [loading, setLoading] = React.useState<boolean>(true)
   
   useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
-      setMovies(DEFAULT_MOVIES)
-      setLoading(false);
-    }, 2000);
+    try {
+      // get recommended movies from model 
+
+      setTimeout(() => {
+        setMovies(DEFAULT_MOVIES)
+        setLoading(false);
+      }, 2000);
+    }
+    catch (error) {
+      console.log(error)
+    }
   }, [])
 
   if (loading) return <LoadingComponent />

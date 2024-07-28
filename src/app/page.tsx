@@ -10,7 +10,29 @@ import { MusicGenre } from "./components/MusicGenreList";
 import { useRouter } from "next/navigation";
 import { useMyContext, MyContextProps } from "./AppContext";
 
-const DEFAULT_MOVIE_GENRES = ["Action", "Comedy", "Horror", "Romance", "Mystery", "Thriller", "Sci-Fi"];
+const DEFAULT_MOVIE_GENRES = [
+  "Action",
+  "Adventure",
+  "Animation",
+  "Biography",
+  "Comedy",
+  "Crime",
+  "Drama",
+  "Family",
+  "Fantasy",
+  "Film-Noir",
+  "History",
+  "Horror",
+  "Music",
+  "Musical",
+  "Mystery",
+  "Romance",
+  "Sci-Fi",
+  "Sport",
+  "Thriller",
+  "War",
+  "Western"
+];
 
 const DEFAULT_MOVIES = [
   // Action movies

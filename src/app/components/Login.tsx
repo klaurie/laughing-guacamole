@@ -34,11 +34,31 @@ const Login: React.FC<LoginProps> = ({
   // retrieve user music info from Spotify
   const handleLogin = async () => {
     console.log(defaultMusicGenres);
-    if (defaultMusicGenres.length > 0) {
-      handleImportMusic();
+
+    try {
+      // // fetch auth token from backend 
+      const response = await fetch(
+        `${APP_URL}/login` ,
+        // {mode: 'no-cors'}
+      );
+      // const response = await fetch(`${APP_URL}/`)
+      // top music genres 
+      console.log('response', response);
+      const data = await response.json();
+      console.log('data', data);
+      
+      
+      // if (defaultMusicGenres.length > 0) {
+      //   handleImportMusic();
+      // }
+      // setMusicGenres(defaultMusicGenres);
+      closeModal();
+
     }
-    setMusicGenres(defaultMusicGenres);
-    closeModal();
+    catch (error) {
+      console.error(error);
+    }
+
   };
 
 

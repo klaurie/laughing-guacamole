@@ -10,6 +10,7 @@ const NavBar = () => {
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/musicGenres', label: 'Music Genres' },
+    { href: '/test', label: 'Test' },
     // { href: '/about', label: 'About' },
     // { href: '/posts', label: 'Posts' },
   ];
