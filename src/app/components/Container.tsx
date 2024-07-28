@@ -7,7 +7,7 @@ const Container = ({
 }>) => {
   return (
     <div
-      className='container mx-auto px-10 lg:px-20 max-w-7xl'
+      className='min-h-screen container mx-auto px-10 lg:px-20 max-w-7xl'
     >{children}</div>
   )
 }

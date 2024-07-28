@@ -39,7 +39,6 @@ const Login: React.FC<LoginProps> = ({
       // // fetch auth token from backend 
       const response = await fetch(
         `${APP_URL}/login` ,
-        // {mode: 'no-cors'}
       );
       // const response = await fetch(`${APP_URL}/`)
       // top music genres 
@@ -47,11 +46,34 @@ const Login: React.FC<LoginProps> = ({
       const data = await response.json();
       console.log('data', data);
       
-      
       // if (defaultMusicGenres.length > 0) {
       //   handleImportMusic();
       // }
       // setMusicGenres(defaultMusicGenres);
+      closeModal();
+
+    }
+    catch (error) {
+      console.error(error);
+    }
+
+  };
+  const handleFakeLogin = async () => {
+    console.log(defaultMusicGenres);
+
+    try {
+      // // fetch auth token from backend 
+      const response = await fetch(`${APP_URL}/user/music/genres`);
+      // top music genres 
+      // console.log('response', response);
+      const data = await response.json();
+      console.log('data', data);
+      
+      
+      if (defaultMusicGenres.length > 0) {
+        handleImportMusic();
+      }
+      setMusicGenres(defaultMusicGenres);
       closeModal();
 
     }
@@ -84,6 +106,7 @@ const Login: React.FC<LoginProps> = ({
 
           <div className="modal-action">
             <button className="btn btn-primary" onClick={handleLogin}>Login</button>
+            <button className="btn btn-primary" onClick={handleFakeLogin}>Fake Login</button>
           </div>
         </div>
       </dialog>

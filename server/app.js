@@ -4,7 +4,7 @@ const SPOTIFY_CLIENT_SECRET='f7a4232895404a64b3b0cfdbe5bcb8e2'
 
 var client_id = SPOTIFY_CLIENT_ID;
 var client_secret = SPOTIFY_CLIENT_SECRET;
-var redirect_uri = 'http://192.168.68.60:8000/callback';
+var redirect_uri = 'http://localhost:8000/callback';
 
 const querystring = require('querystring');
 const request = require('request');
@@ -116,5 +116,20 @@ app.get('/login', async function(req, res) {
   // res.send(response);
 });
 
+const DEFAULT_MUSIC_GENRES = [
+  { genre: "Rock", subgenres: ["Alternative", "Classic Rock", "Hard Rock"] },
+  { genre: "Pop", subgenres: ["Dance", "Synthpop", "Electropop"] },
+  { genre: "Jazz", subgenres: ["Smooth", "Bebop", "Swing"] },
+  { genre: "Classical", subgenres: ["Baroque", "Romantic", "Classical Era"] },
+  { genre: "Electronic", subgenres: ["House", "Techno", "Trance"] },
+  { genre: "Country", subgenres: ["Bluegrass", "Honky Tonk", "Country Rock"] },
+  { genre: "Rap", subgenres: ["Trap", "Old School", "Gangsta Rap"] },
+  { genre: "R&B", subgenres: ["Soul", "Contemporary R&B", "Funk"] },
+  { genre: "Latin", subgenres: ["Reggaeton", "Salsa", "Bossa Nova"] },
+];
+app.get('/user/music/genres', async function(req, res) {
+
+  res.send(DEFAULT_MUSIC_GENRES);
+})
 
 app.listen(port, () => console.log(`App listening on port ${port}!`))
