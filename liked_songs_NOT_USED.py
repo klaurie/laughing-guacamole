@@ -10,7 +10,7 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id="cea88769eddc49e0b7f7ed
 
 # Load the CSV file and create a mapping dictionary
 genres_dict = {}
-csv_file_path = 'subgenres.csv'
+csv_file_path = 'genres.csv'
 
 with open(csv_file_path, mode='r', encoding='utf-8-sig') as csv_file:
     csv_reader = csv.reader(csv_file)

@@ -8,6 +8,7 @@ def map_subgenre_to_genre(csv_file_path):
     genres_dict = {}
     with open(csv_file_path, mode='r', encoding='utf-8-sig') as csv_file:
         csv_reader = csv.reader(csv_file)
+        next(csv_reader)
         for row in csv_reader:
             genre, subgenre = row
             genres_dict[subgenre] = genre
@@ -16,10 +17,10 @@ def map_subgenre_to_genre(csv_file_path):
     
 # Initialize Spotipy with user authorization
 def auth_spotify(client_id, client_secret, redirect_uri, scope):
-    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id="cea88769eddc49e0b7f7ed76ee197517",
-                                               client_secret="a7c55ba17fc94e7584175a25c93c2174",
-                                               redirect_uri="http://localhost:8080",
-                                               scope="user-top-read"))
+    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=client_id,
+                                               client_secret=client_secret,
+                                               redirect_uri=redirect_uri,
+                                               scope=scope))
     return sp
 
 # Fetch all top artists
@@ -78,12 +79,12 @@ def top_3_genres():
     redirect_uri = "http://localhost:8080"
     scope = "user-top-read"
 
-    csv_fp = "subgenres.csv"
+    csv_fp = "csv_files/genres.csv"
     genres_dict = map_subgenre_to_genre(csv_fp)
     sp = auth_spotify(client_id, client_secret, redirect_uri, scope)
     top_artists = get_top_artists(sp)
     subgenres = get_genres_from_artists(top_artists)
-    print(subgenres)
+    # print(subgenres)
     result = get_top_genres(subgenres, genres_dict, 3)
 
     # Return a list: ['genre 1', 'genre 2', 'genre 3']
@@ -96,7 +97,7 @@ def top_genre_with_top_3_subgenres():
     redirect_uri = "http://localhost:8080"
     scope = "user-top-read"
 
-    csv_fp = "subgenres.csv"
+    csv_fp = "csv_files/genres.csv"
     genres_dict = map_subgenre_to_genre(csv_fp)
     sp = auth_spotify(client_id, client_secret, redirect_uri, scope)
     top_artists = get_top_artists(sp)

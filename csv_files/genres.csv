@@ -1,3 +1,4 @@
+genre,subgenre
 pop,pop
 pop,dance pop
 pop,pov: indie
@@ -3304,7 +3305,7 @@ rock,rock sul-mato-grossense
 rock,rock sergipano
 rock,aberdeen indie
 rock,new hampshire indie
-metal+a3882,metal
+metal,metal
 metal,alternative metal
 metal,post-grunge
 metal,nu metal
