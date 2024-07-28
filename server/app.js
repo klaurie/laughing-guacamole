@@ -1,39 +1,94 @@
 const SPOTIFY_CLIENT_ID='3e0d8d7496fb4fbab87b68ec5d108fd7'
 const SPOTIFY_CLIENT_SECRET='f7a4232895404a64b3b0cfdbe5bcb8e2'
-
-
-var client_id = SPOTIFY_CLIENT_ID;
-var client_secret = SPOTIFY_CLIENT_SECRET;
-var redirect_uri = 'http://localhost:8000/callback';
-
-const querystring = require('querystring');
-const request = require('request');
-const express = require('express')
-const app = express()
-const cors = require('cors')
 const port = 8000
 
+var express = require('express');
+var request = require('request');
+var crypto = require('crypto');
+var cors = require('cors');
+var querystring = require('querystring');
+var cookieParser = require('cookie-parser');
+
+var client_id = '3e0d8d7496fb4fbab87b68ec5d108fd7'; // your clientId
+var client_secret = 'f7a4232895404a64b3b0cfdbe5bcb8e2'; // Your secret
+var redirect_uri = 'http://localhost:8000/callback'; // Your redirect uri
+
+const generateRandomString = (length) => {
+  return crypto
+  .randomBytes(60)
+  .toString('hex')
+  .slice(0, length);
+}
+
+var stateKey = 'spotify_auth_state';
+
+var app = express();
+
 // add CORS
-// app.use(cors());
+app.use(cors());
 // Configure CORS to allow requests from specific origin
-app.use(cors({
-  // origin: 'http://192.168.68.60:3000', 
-  origin: 'http://localhost:3000', 
-  methods: 'GET,POST,PUT,DELETE,OPTIONS',
-  allowedHeaders: 'Content-Type, Authorization',
-}));
+// app.use(cors({
+//   // origin: 'http://192.168.68.60:3000', 
+//   origin: 'http://localhost:3000', 
+//   methods: 'GET,POST,PUT,DELETE,OPTIONS',
+//   allowedHeaders: 'Content-Type, Authorization',
+// }));
 
 app.get('/', function(req, res) {
   res.send({message: 'Hello World!'}); // Send a response to the client (e.g., 'Hello World!')
 })
-var stateKey = 'spotify_auth_state';
+
+
+app.get('/login', async function(req, res) {
+
+  var state = generateRandomString(16);
+  res.cookie(stateKey, state);
+
+  // your application requests authorization
+  var scope = 'user-read-private user-read-email';
+
+
+  // // const response = await fetch('https://accounts.spotify.com/authorize?response_type=code&client_id=' + client_id + '&scope=' + scope + '&redirect_uri=' + redirect_uri + '&state=' + state)
+  // const response = request.get({
+  //   url: 'https://accounts.spotify.com/authorize?response_type=code&client_id=' + client_id + '&scope=' + scope + '&redirect_uri=' + redirect_uri + '&state=' + state
+  // }, function (error, response, body) {
+  //   console.log('error:', error); // Print the error if one occurred
+  //   console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+  //   console.log('body:', body); // Print the HTML for the Google homepage.
+  //   console.log('response:', response)
+  // })
+
+  // console.log(response)
+
+  // const data = await response.json()
+  // console.log(data)
+
+  res.redirect('https://accounts.spotify.com/authorize?' +
+    querystring.stringify({
+      response_type: 'code',
+      client_id: client_id,
+      scope: scope,
+      redirect_uri: redirect_uri,
+      state: state
+    }));
+});
+
 app.get('/callback', function(req, res) {
+
+  // your application requests refresh and access tokens
+  // after checking the state parameter
+
   var code = req.query.code || null;
   var state = req.query.state || null;
-  console.log("req.query",req.query);
-  // res.send('Callback');
+  var storedState = req.cookies ? req.cookies[stateKey] : null;
 
-  res.clearCookie(stateKey);
+  if (state === null || state !== storedState) {
+    res.redirect('/#' +
+      querystring.stringify({
+        error: 'state_mismatch'
+      }));
+  } else {
+    res.clearCookie(stateKey);
     var authOptions = {
       url: 'https://accounts.spotify.com/api/token',
       form: {
@@ -53,9 +108,6 @@ app.get('/callback', function(req, res) {
 
         var access_token = body.access_token,
             refresh_token = body.refresh_token;
-
-        console.log('access_token',access_token);
-        console.log('refresh_token',refresh_token);
 
         var options = {
           url: 'https://api.spotify.com/v1/me',
@@ -81,39 +133,7 @@ app.get('/callback', function(req, res) {
           }));
       }
     });
-  
-})
-
-function generateRandomString(length) {
-  var text = '';
-  var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-  for (var i = 0; i < length; i++) {
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
   }
-  return text;
-}
-
-
-app.get('/login', async function(req, res) {
-
-  var state = generateRandomString(16);
-  var scope = 'user-read-private user-read-email';
-
-  console.log('client_id: ' + client_id);
-  console.log('redirect_uri: ' + redirect_uri);
-
-  // const response = await fetch('https://accounts.spotify.com/authorize?' +
-  res.redirect('https://accounts.spotify.com/authorize?' +
-    querystring.stringify({
-      response_type: 'code',
-      client_id: client_id,
-      scope: scope,
-      redirect_uri: redirect_uri,
-      state: state
-    }));
-  
-  // res.send(response);
 });
 
 const DEFAULT_MUSIC_GENRES = [

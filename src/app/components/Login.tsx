@@ -40,12 +40,11 @@ const Login: React.FC<LoginProps> = ({
       const response = await fetch(
         `${APP_URL}/login` ,
       );
-      // const response = await fetch(`${APP_URL}/`)
       // top music genres 
-      // console.log('response', response);
       const data = await response.json();
       console.log('data', data);
       
+      // // set music genres
       // if (defaultMusicGenres.length > 0) {
       //   handleImportMusic();
       // }
