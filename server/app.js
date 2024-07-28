@@ -4,14 +4,14 @@ const SPOTIFY_CLIENT_SECRET='f7a4232895404a64b3b0cfdbe5bcb8e2'
 
 var client_id = SPOTIFY_CLIENT_ID;
 var client_secret = SPOTIFY_CLIENT_SECRET;
-var redirect_uri = 'http://192.168.68.60:8888/callback';
+var redirect_uri = 'http://192.168.68.60:8000/callback';
 
 const querystring = require('querystring');
 const request = require('request');
 const express = require('express')
 const app = express()
 const cors = require('cors')
-const port = 8888
+const port = 8000
 
 // add CORS
 // app.use(cors());
