@@ -35,6 +35,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-/__pycache__
+flask/__pycache__
 /venv
 credentials.py

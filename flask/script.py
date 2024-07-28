@@ -67,8 +67,11 @@ def test():
 
 @app.route('/top_genres', methods=['GET'])
 def top_genres():
-    data = request.json
-    access_token = data.get('access_token')
+    # print('request.args', request.args)
+    # print('request.args[0]', request.args.get('access_token'))
+    access_token = request.args.get('access_token')
+    print('access_token', access_token)
+    # access_token = data.get('access_token')
     csv_fp = "csv_files/genres.csv"
     genres_dict = map_subgenre_to_genre(csv_fp)
     
@@ -78,6 +81,8 @@ def top_genres():
     result = get_top_genres(subgenres, genres_dict, 3)
     
     return jsonify(result)
+
+    # return jsonify({'message': 'success'})
 
 if __name__ == '__main__':
     app.run(port=5000)
